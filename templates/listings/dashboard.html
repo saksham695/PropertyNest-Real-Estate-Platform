@@ -1,0 +1,298 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PropertyNest | Real Estate Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'listings/styles.css' %}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <nav class="topbar">
+          <div>
+            <p class="eyebrow">PropertyNest</p>
+            <h1>Modern real estate workflows for every stakeholder.</h1>
+          </div>
+          <div class="role-pills" aria-label="Supported roles">
+            {% for role in roles %}
+              <span>{{ role }}</span>
+            {% endfor %}
+          </div>
+        </nav>
+        <div class="hero-grid">
+          <section class="hero-copy card">
+            <h2>Discover, compare, finance, and schedule visits from a single workspace.</h2>
+            <p>
+              PropertyNest demonstrates complex real estate product patterns: image galleries,
+              advanced search filters, shortlist management, scheduling, mortgage estimation,
+              document tracking, agent trust signals, and neighborhood analytics.
+            </p>
+            <div class="hero-actions">
+              <a href="#search-panel" class="button primary">Explore listings</a>
+              <a href="#calculator" class="button secondary">Estimate payment</a>
+            </div>
+          </section>
+          <section class="insights card">
+            <h2>Platform snapshot</h2>
+            <div class="stats-grid">
+              <article>
+                <strong>{{ listings_count }}</strong>
+                <span>active listings</span>
+              </article>
+              <article>
+                <strong>12</strong>
+                <span>agents verified</span>
+              </article>
+              <article>
+                <strong>94%</strong>
+                <span>visit show-up rate</span>
+              </article>
+              <article>
+                <strong>4.8/5</strong>
+                <span>avg agent rating</span>
+              </article>
+            </div>
+          </section>
+        </div>
+      </header>
+
+      <main>
+        <section id="search-panel" class="search-section card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Search &amp; filter</p>
+              <h2>Find the right property faster</h2>
+            </div>
+            <p>Filter by budget, location, property type, and intent for rich discovery flows.</p>
+          </div>
+
+          <form id="filters" class="filters-grid">
+            <label>
+              <span>Location</span>
+              <select name="location">
+                <option value="all">All locations</option>
+                {% for location in locations %}
+                  <option value="{{ location }}">{{ location }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              <span>Property type</span>
+              <select name="type">
+                <option value="all">All types</option>
+                {% for property_type in property_types %}
+                  <option value="{{ property_type }}">{{ property_type }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              <span>Intent</span>
+              <select name="intent">
+                <option value="all">Buy or rent</option>
+                <option value="buy">Buy</option>
+                <option value="rent">Rent</option>
+              </select>
+            </label>
+            <label>
+              <span>Max price</span>
+              <input type="range" name="maxPrice" min="1500" max="2500000" step="500" value="2500000" />
+              <strong id="max-price-label">Up to $2,500,000</strong>
+            </label>
+            <label class="filter-toggle">
+              <span>Only favorites</span>
+              <input type="checkbox" name="favoritesOnly" />
+            </label>
+            <button type="reset" class="button secondary reset-button">Reset filters</button>
+          </form>
+        </section>
+
+        <section class="content-grid">
+          <div class="listings-column">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Listings</p>
+                <h2>Curated homes and rentals</h2>
+              </div>
+              <p id="results-summary">0 properties</p>
+            </div>
+            <div id="listing-grid" class="listing-grid"></div>
+          </div>
+
+          <aside class="sidebar-stack">
+            <section class="card shortlist-panel">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Favorites</p>
+                  <h2>Shortlist</h2>
+                </div>
+              </div>
+              <ul id="shortlist" class="shortlist"></ul>
+            </section>
+
+            <section id="calculator" class="card calculator-panel">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Mortgage calculator</p>
+                  <h2>Estimate monthly cost</h2>
+                </div>
+              </div>
+              <form id="mortgage-form" class="calculator-form">
+                <label>
+                  <span>Home price</span>
+                  <input type="number" name="principal" min="50000" step="1000" value="850000" />
+                </label>
+                <label>
+                  <span>Down payment (%)</span>
+                  <input type="number" name="downPayment" min="0" max="100" step="1" value="20" />
+                </label>
+                <label>
+                  <span>Interest rate (%)</span>
+                  <input type="number" name="interestRate" min="1" max="15" step="0.1" value="6.2" />
+                </label>
+                <label>
+                  <span>Term (years)</span>
+                  <input type="number" name="termYears" min="5" max="40" step="1" value="30" />
+                </label>
+              </form>
+              <div class="mortgage-result">
+                <strong id="mortgage-payment">$0/mo</strong>
+                <span id="mortgage-breakdown">Includes principal and interest estimate.</span>
+              </div>
+            </section>
+
+            <section class="card scheduling-panel">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Visit scheduling</p>
+                  <h2>Book a property tour</h2>
+                </div>
+              </div>
+              <form id="visit-form" class="visit-form">
+                <label>
+                  <span>Property</span>
+                  <select name="propertyId">
+                    {% for listing in visit_options %}
+                      <option value="{{ listing.id }}">{{ listing.title }} — {{ listing.location }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label>
+                  <span>Date</span>
+                  <input type="date" name="visitDate" required />
+                </label>
+                <label>
+                  <span>Time</span>
+                  <input type="time" name="visitTime" required />
+                </label>
+                <button type="submit" class="button primary">Schedule visit</button>
+              </form>
+              <p id="visit-confirmation" class="form-message" aria-live="polite"></p>
+            </section>
+          </aside>
+        </section>
+
+        <section class="lower-grid">
+          <section class="card doc-panel">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Document management</p>
+                <h2>Deal room readiness</h2>
+              </div>
+              <p>Track compliance artifacts for owners, agents, and admins.</p>
+            </div>
+            <div class="document-list">
+              {% for doc in documents %}
+                <article class="doc-item">
+                  <div>
+                    <strong>{{ doc.name }}</strong>
+                    <p>{{ doc.owner }}</p>
+                  </div>
+                  <span class="doc-status {{ doc.status }}">{{ doc.status }}</span>
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="card reviews-panel">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Agent reviews</p>
+                <h2>Trust and conversion signals</h2>
+              </div>
+            </div>
+            <div class="reviews-list">
+              {% for review in reviews %}
+                <article class="review-card">
+                  <div class="review-head">
+                    <strong>{{ review.agent }}</strong>
+                    <span class="review-stars">{{ review.stars }} ★</span>
+                  </div>
+                  <p>{{ review.summary }}</p>
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+
+          <section class="card analytics-panel">
+            <div class="section-heading compact">
+              <div>
+                <p class="eyebrow">Neighborhood analytics</p>
+                <h2>Local market intelligence</h2>
+              </div>
+              <p>Useful for geolocation-aware search journeys and investor comparisons.</p>
+            </div>
+            <div class="analytics-grid">
+              {% for item in analytics %}
+                <article>
+                  <strong>{{ item.area }}</strong>
+                  <div class="tag-row">
+                    <span class="metric-chip">Walk Score <span>{{ item.walk_score }}</span></span>
+                    <span class="metric-chip">Schools <span>{{ item.schools }}</span></span>
+                    <span class="metric-chip">YoY Growth <span>{{ item.yoy_growth }}</span></span>
+                    <span class="metric-chip">Avg DOM <span>{{ item.avg_dom }} days</span></span>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    {{ seed_data_json|json_script:'propertynest-seed-data' }}
+    <template id="listing-template">
+      <article class="listing-card card">
+        <div class="listing-gallery">
+          <img class="listing-photo" alt="Property photo" />
+          <div class="floorplan-chip">Floor plan available</div>
+        </div>
+        <div class="listing-content">
+          <div class="listing-header">
+            <div>
+              <p class="listing-price"></p>
+              <h3 class="listing-title"></h3>
+            </div>
+            <button class="favorite-button" type="button" aria-label="Toggle favorite">♡</button>
+          </div>
+          <p class="listing-meta"></p>
+          <p class="listing-description"></p>
+          <div class="tag-row"></div>
+          <div class="agent-row">
+            <div>
+              <strong class="agent-name"></strong>
+              <span class="agent-rating"></span>
+            </div>
+            <a href="#calculator" class="button tertiary">Finance this home</a>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="{% static 'listings/app.js' %}"></script>
+  </body>
+</html>
